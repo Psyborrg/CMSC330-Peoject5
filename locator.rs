@@ -181,8 +181,11 @@ pub fn target_locator<'a>(allies: &'a HashMap<&String, (i32,i32)>, enemies: &'a 
                     if taken.contains(pair_node.data.1) == false {
                         return (pair_node.data.1, pair_node.data.2.0, pair_node.data.2.1);
                     }
-                } else {
+                } else if taken.contains(pair_node.data.0) == false && taken.contains(pair_node.data.1) == false {
+                    taken.push(pair_node.data.0);
                     taken.push(pair_node.data.1);
+                } else {
+                    ; // Do nothing if one member of the pair is already taken
                 }
             }
         }
@@ -192,5 +195,4 @@ pub fn target_locator<'a>(allies: &'a HashMap<&String, (i32,i32)>, enemies: &'a 
     return ("Something Very Bad Happened Because No Result was Found", 0, 0);
 
 }
-
 
