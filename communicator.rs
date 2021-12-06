@@ -76,51 +76,67 @@ impl Command {
 **/
 pub fn to_command(s: &str) -> Command {
     
-    let mut current_match = s.strip_prefix("power ");
-    match current_match {
-        None => ,//Not a power command so check the others
-        Some(power_string) => { // Possibly a power command so keep matching
-            let mut inc_match = current_match.strip_prefix("inc"); // Look for the inc portion of the command
-            let mut dec_match = current_match.strip_prefix("dec"); // Look for the dec portion of the command
-            match inc_match {
-                None => return Command::Invalid,
-                Some(value_string)
-            }
-        
-        }
-    
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    if current_match == None {
-        // If the current match is none then this is not a power command
-        current_match = s.strip_suffix("missiles");
-        if current_match == None {
-            // If the current match is none, then it is not a missile command
-            current_match = s.strip_prefix("shield");
-            if current_match == None {
-                // If the current match is none, then it is not a shield command
+    let mut power_inc_match = s.strip_prefix("power inc ");
+    match power_inc_match {
+        None => {   // Not an increase power command so check the others
+            let mut power_dec_match = strip_prefix("power dec ");
+            match power_dec_match {
+                None => { // Not a decrease power command so check the others
+                    let mut shield_on_match = strip_prefix("shield on");
+                    match shield_on_match {
+                        None => { // Not a shield on command so check the others
+                            let mut shield_off_match = strip_prefix("shield off");
+                            match shield_off_match {
+                                None => { // Not a shield off command so check the others
+                                    let mut try_match = strip_prefix("try calling Miss Potts");
+                                    match try_match {
+                                        None => { // Not a try command so check the others
+                                            return Command::Invalid; // Nothing after this so not a command
+                                        },
+                                        Some(rest) => { // If the rest of the string is empty then this is a try command
+                                            if rest == "" {
+                                                return Command::Try;
+                                            } else {
+                                                return Command::Invalid;
+                                            }
+                                        }
+                                    }
+                                },
+                                Some(rest) => { // If the rest of the string is empty then this is a proper shield off command
+                                    if rest == "" {
+                                        return Command::Shield(false);
+                                    } else {
+                                        return Command::Invalid;
+                                    }
+                                }
+                            }
+                        },
+                        Some(rest) => { // If the rest of the string is empty then this is a proper shield on command
+                            if rest == "" {
+                                return Command::Shield(true);
+                            } else {
+                                return Command::Invalid;
+                            }
+                        }
+                    }
+                },
+                Some(value_string) => { // Seems like a missles dec command so check the rest to see if it is an i32
+                    let value_as_int = s1.parse::<i32>();
 
-                if s[0..s.len()] == "try calling Miss Potts" {
-                    return Command::Try;
-                } else {
-                    return Command::Invalid; // If we got to here then it is not a valid command
+                    match test {
+                        Ok(ok) => return Command::Missiles(false, ok),
+                        Err(e) => return Command::Invalid, 
+                    }  
                 }
             }
-        }
-    } else { // let mut current_match = s.strip_prefix("power ") == Some (somethign)
-        let mut power_match = current_match.strip_prefix("inc");
-    }
+        },
+        Some(value_string) => { // Seems like a missles inc command so check the rest to see if it is an i32
+            let value_as_int = s1.parse::<i32>();
 
-    return Command::Invalid;
+            match test {
+                Ok(ok) => return Command::Missiles(true, ok),
+                Err(e) => return Command::Invalid, 
+            }  
+        }
+    }
 }
